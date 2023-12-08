@@ -19,11 +19,11 @@ type IndexPage struct {
 func (ip *IndexPage) Render() app.UI {
 	return app.Table().Body(
 		app.Script().Src("web/websocket.js"),
-		app.Img().Src("web/hitchhiker-thumb.jpg").Style("text-align", "center").Style("width", "180px").Style("height", "180px").Alt("Logo"),
+		app.Img().Src("web/hitchhiker-thumb.jpg").Class("center").Style("width", "180px").Style("height", "180px").Alt("Logo"),
 		app.Table().Class("centered-table").Body(
 			app.Tr().Body(
 				app.Td().Body(
-					app.H2().Style("text-align", "center").Text("Instructions"),
+					app.H2().Style("text-align", "center").Text(""),
 				),
 				app.Td().Body(
 					app.H2().Style("text-align", "center").Text("Prompt Sent"),
