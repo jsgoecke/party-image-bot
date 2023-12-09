@@ -39,7 +39,7 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	// Initialize our message queue
-	promptsImagesChan = make(chan PromptsImages)
+	promptsImagesChan = make(chan PromptsImages, 1000)
 
 	// PWA
 	app.Route("/", &IndexPage{})

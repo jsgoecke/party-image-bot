@@ -25,7 +25,9 @@ type PromptsImages struct {
 
 // SendMessage sends a message to the client
 func sendMessage() {
+	log.Print("Waiting for promptsImagesChan...")
 	event := <-promptsImagesChan
+	log.Print("Received promptsImagesChan...")
 	body, err := json.Marshal(event)
 	if err != nil {
 		log.Fatalf("Error occurred during marshaling. Error: %s", err.Error())
@@ -48,6 +50,8 @@ func processSMS(w http.ResponseWriter, r *http.Request) {
 	promptsImages.Status = "SMS-RECEIVED"
 	log.Println("Received SMS from -> " + promptsImages.From + " with prompt -> " + promptsImages.HumanPrompt)
 	promptsImagesChan <- *promptsImages
+	log.Print("Sent promptsImagesChan...")
+	sendMessage()
 
 	log.Println("Generating human prompted image...")
 	wg := sync.WaitGroup{}
@@ -66,6 +70,7 @@ func processSMS(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Sending images to client...")
 	promptsImagesChan <- *promptsImages
+	sendMessage()
 
 	w.WriteHeader(http.StatusOK)
 }
