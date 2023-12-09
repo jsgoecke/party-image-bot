@@ -3,25 +3,33 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
+	"github.com/go-redis/redis"
 	"github.com/gorilla/websocket"
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 )
 
 // MessageDelay is the delay between messages in seconds
-const MessageDelay = 180
+const MessageDelay = 120
 const AiImageSize = "1024px"
 const IconImageSize = "180px"
 const QRCodeImageSize = "240px"
 const SystemPrompt = `
 You are a master at creating prompts for DALL-E images in the genre of the
-Hitchhiker's Guide to the Galaxy by Douglas Adams. Create 
-an image that would be at home in the Hitchhiker's Guide 
-based on the following prompt: 
+Hitchhiker's Guide to the Galaxy by Douglas Adams.  
+
+You are also a DALL-E-3 prompt engineer.  You are tasked with creating a prompt
+that is no more than 1000 characters long and does not violate the safety guidelines of 
+DALL-E-3.
+
+Now please create an image prompt that would be at home in the Hitchhiker's 
+guide based on the following prompt details: 
 `
 
 var promptsImagesChan chan PromptsImages
 var ws *websocket.Conn
+var rdb *redis.Client
 
 // Log HTTP requests
 func logRequest(next http.Handler) http.Handler {
@@ -52,6 +60,13 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 func main() {
 	// Initialize our message queue
 	promptsImagesChan = make(chan PromptsImages, 1000)
+
+	// Initialize Redis
+	rdb = redis.NewClient(&redis.Options{
+		Addr:     os.Getenv("REDIS_DATABASE"),
+		Password: os.Getenv("REDIS_PASSWORD"), // no password set
+	})
+
 	go sendMessage()
 
 	// PWA

@@ -5,9 +5,14 @@ socket.onopen = function() {
     console.log("Websocket connection established!");
 }
 
-socket.onclose = function() {
-    console.log("Websocket connection closed!");
-}
+socket.onclose = () => {
+    console.log('WebSocket connection closed');
+    if (retries > 0) {
+        retries--;
+        console.log('Retrying websocket connection...)');
+        setTimeout(connectWebSocket, 5000); // Retry after 5 seconds
+    }
+};
 
 socket.onmessage = function(message) {
     console.log(message);
@@ -18,10 +23,9 @@ socket.onmessage = function(message) {
           console.log("Received connect message from websocket");
           break;
         case "IMAGES-GENERATED":
-            console.log(json.human_image)
-            document.getElementById("statusUpdate").innerHTML = "\"" + json.human_prompt + "\" from " + json.from;
-            document.getElementById("aiImage").src = json.ai_image;
-            document.getElementById("aiPrompt").innerHTML = json.ai_prompt;
+            if (json.ai_image != null){
+                document.getElementById("aiImage").src = json.ai_image;
+            }
             break;
       }
 }
