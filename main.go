@@ -8,6 +8,9 @@ import (
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 )
 
+// MessageDelay is the delay between messages in seconds
+const MessageDelay = 180
+
 var promptsImagesChan chan PromptsImages
 var ws *websocket.Conn
 
@@ -40,6 +43,7 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 func main() {
 	// Initialize our message queue
 	promptsImagesChan = make(chan PromptsImages, 1000)
+	go sendMessage()
 
 	// PWA
 	app.Route("/", &IndexPage{})
