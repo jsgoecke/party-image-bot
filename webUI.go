@@ -17,7 +17,7 @@ type IndexPage struct {
 
 // Render renders the main page
 func (ip *IndexPage) Render() app.UI {
-	return app.Table().Body(
+	return app.P().Body(
 		app.Script().Src("web/websocket.js"),
 		app.Img().Src("web/hitchhiker-thumb.jpg").Class("center").Style("width", "180px").Style("height", "180px").Alt("Logo"),
 		app.Table().Class("centered-table").Body(
