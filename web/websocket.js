@@ -17,18 +17,10 @@ socket.onmessage = function(message) {
         case "CONNECTED":
           console.log("Received connect message from websocket");
           break;
-        case "SMS-RECEIVED":
-          var msg = "SMS Recived from " + json.from + " with prompt: " + "\"" + json.human_prompt + "\"";
-          document.getElementById("statusUpdate").innerHTML = msg;
-          document.getElementById("humanImage").src = "https://goecke.ngrok.dev/web/cat-spin.gif";
-          document.getElementById("aiImage").src = "https://goecke.ngrok.dev/web/cat-spin.gif";
-          break;
         case "IMAGES-GENERATED":
             console.log(json.human_image)
-            document.getElementById("statusUpdate").innerHTML = "Images by: " + json.from;
-            document.getElementById("humanImage").src = json.human_image;
+            document.getElementById("statusUpdate").innerHTML = "\"" + json.human_prompt + "\" from " + json.from;
             document.getElementById("aiImage").src = json.ai_image;
-            document.getElementById("humanPrompt").innerHTML = json.human_prompt;
             document.getElementById("aiPrompt").innerHTML = json.ai_prompt;
             break;
       }

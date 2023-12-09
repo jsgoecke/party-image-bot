@@ -10,6 +10,15 @@ import (
 
 // MessageDelay is the delay between messages in seconds
 const MessageDelay = 180
+const AiImageSize = "1024px"
+const IconImageSize = "180px"
+const QRCodeImageSize = "240px"
+const SystemPrompt = `
+You are a master at creating prompts for DALL-E images in the genre of the
+Hitchhiker's Guide to the Galaxy by Douglas Adams. Create 
+an image that would be at home in the Hitchhiker's Guide 
+based on the following prompt: 
+`
 
 var promptsImagesChan chan PromptsImages
 var ws *websocket.Conn

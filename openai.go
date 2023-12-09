@@ -16,7 +16,6 @@ import (
 type PromptsImages struct {
 	MessageType string `json:"message_type,omitempty"`
 	HumanPrompt string `json:"human_prompt,omitempty"`
-	HumanImage  string `json:"human_image,omitempty"`
 	AiPrompt    string `json:"ai_prompt,omitempty"`
 	AiImage     string `json:"ai_image,omitempty"`
 	From        string `json:"from,omitempty"`
@@ -28,6 +27,7 @@ type PromptsImages struct {
 func sendMessage() {
 	for event := range promptsImagesChan {
 		log.Print("Received promptsImagesChan...")
+		log.Print(event)
 		body, err := json.Marshal(event)
 		if err != nil {
 			log.Fatalf("Error occurred during marshaling. Error: %s", err.Error())
@@ -43,7 +43,6 @@ func sendMessage() {
 // POST /api/v1/sms
 func processSMS(w http.ResponseWriter, r *http.Request) {
 	promptsImages := &PromptsImages{}
-
 	err := r.ParseForm()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -51,28 +50,12 @@ func processSMS(w http.ResponseWriter, r *http.Request) {
 	}
 	promptsImages.HumanPrompt = r.Form.Get("Body")
 	promptsImages.From = r.Form.Get("From")
-	promptsImages.Status = "SMS-RECEIVED"
-	log.Println("Received SMS from -> " + promptsImages.From + " with prompt -> " + promptsImages.HumanPrompt)
-	promptsImagesChan <- *promptsImages
-
-	log.Println("Generating human prompted image...")
-	wg := sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		promptsImages.HumanImage = createImage(promptsImages.HumanPrompt)
-	}()
-
 	log.Println("Generating ai prompt...")
 	promptsImages.AiPrompt = embellishPrompt(promptsImages.HumanPrompt)
 	log.Println("Generating ai prompted image...")
 	promptsImages.AiImage = createImage(promptsImages.AiPrompt)
 	promptsImages.Status = "IMAGES-GENERATED"
-	wg.Wait()
-
-	log.Println("Sending images to client...")
 	promptsImagesChan <- *promptsImages
-
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -102,7 +85,7 @@ func embellishPrompt(prompt string) string {
 	client := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
 	messages := make([]openai.ChatCompletionMessage, 0)
 
-	prompt = "Create a prompt for DALL-E with: " + prompt + ", in the style of Hitchhiker's Guide to the Galaxy by Douglas Adams. The prompt should be equal to or less than 1000 characters."
+	prompt = SystemPrompt + prompt
 	messages = append(messages, openai.ChatCompletionMessage{
 		Role:    openai.ChatMessageRoleUser,
 		Content: prompt,
