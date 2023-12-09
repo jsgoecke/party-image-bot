@@ -8,6 +8,7 @@ import (
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 )
 
+var promptsImagesChan chan PromptsImages
 var ws *websocket.Conn
 
 // Log HTTP requests
@@ -37,6 +38,9 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	// Initialize our message queue
+	promptsImagesChan = make(chan PromptsImages)
+
 	// PWA
 	app.Route("/", &IndexPage{})
 	app.RunWhenOnBrowser()
